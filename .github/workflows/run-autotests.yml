@@ -7,55 +7,43 @@ on:
     branches: [main]
 
 jobs:
-  run-tests:
+  test:
     runs-on: ubuntu-latest
 
     steps:
-    # Step 1: Checkout the repository
       - name: Checkout the repository
         uses: actions/checkout@v4
 
-      # Step 2: Set up Node.js (Make sure you match the version your app uses)
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'  # Specify your desired Node.js version
+          node-version: '18'
 
-      # Step 3: Install dependencies
       - name: Install dependencies
         run: |
-          npm install  # or yarn install, pnpm install based on your setup
+          npm install
 
-      # Step 4: Start Next.js app in the background
       - name: Start Next.js app in the background
         run: |
-          nohup npm run dev &  # Starts the Next.js app in the background
-
-      # Step 5: Wait for the Next.js app to be ready
-      - name: Wait for Next.js app to be ready
-        run: |
-          while ! curl --silent --fail http://localhost:3000; do
-            echo "Waiting for server to be ready..."
-            sleep 2
-          done
+          nohup npm run dev &  # Start Next.js app in the background
 
     # Set up Python environment for Playwright
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.11'  # Use any Python version that supports Playwright
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'  # Use any Python version that supports Playwright
 
     # Install dependencies for the Playwright tests
-    - name: Install test dependencies
-      run: |
-        cd tests
-        python -m pip install --upgrade pip
-        pip install -r tests/requirements.txt
-        playwright install
+      - name: Install test dependencies
+        run: |
+          cd tests
+          python -m pip install --upgrade pip
+          pip install -r tests/requirements.txt
+          playwright install
 
     # Run Playwright tests using pytest
-    - name: Run Playwright tests
-      run: |
-        cd tests
-        pytest  # Run the tests using pytest
+      - name: Run Playwright tests
+        run: |
+          cd tests
+          pytest  # Run the tests using pytest
         ##
