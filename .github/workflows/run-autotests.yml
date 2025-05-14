@@ -19,7 +19,7 @@ jobs:
     - name: Checkout the test repo
       uses: actions/checkout@v4
       with:
-        repository: Inna-test/playwrighttests  # Use your repo name here
+        repository: Inna-test/play  # Use your repo name here
         token: ${{ secrets.AUTOTEST_REPO_TOKEN }}  # GitHub Secret for access to the test repo
         path: tests  # Clone the tests repo into a 'tests' folder
 
