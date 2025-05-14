@@ -11,17 +11,33 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # Checkout the code of the nextjs-app repository
-    - name: Checkout this (Next.js) repo
-      uses: actions/checkout@v4
+    # Step 1: Checkout the repository
+      - name: Checkout the repository
+        uses: actions/checkout@v4
 
-    # Checkout the Playwright test repo
-    - name: Checkout the test repo
-      uses: actions/checkout@v4
-      with:
-        repository: Inna-test/play  # Use your repo name here
-        token: ${{ secrets.AUTOTEST_REPO_TOKEN }}  # GitHub Secret for access to the test repo
-        path: tests  # Clone the tests repo into a 'tests' folder
+      # Step 2: Set up Node.js (Make sure you match the version your app uses)
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'  # Specify your desired Node.js version
+
+      # Step 3: Install dependencies
+      - name: Install dependencies
+        run: |
+          npm install  # or yarn install, pnpm install based on your setup
+
+      # Step 4: Start Next.js app in the background
+      - name: Start Next.js app in the background
+        run: |
+          nohup npm run dev &  # Starts the Next.js app in the background
+
+      # Step 5: Wait for the Next.js app to be ready
+      - name: Wait for Next.js app to be ready
+        run: |
+          while ! curl --silent --fail http://localhost:3000; do
+            echo "Waiting for server to be ready..."
+            sleep 2
+          done
 
     # Set up Python environment for Playwright
     - name: Set up Python
