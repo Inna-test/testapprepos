@@ -11,50 +11,55 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Step 1: Checkout the repository (main repository with Next.js app)
       - name: Checkout the repository
         uses: actions/checkout@v4
 
+      # Step 2: Set up Node.js for the Next.js app
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
 
-         # Step 2: Checkout the Playwright tests repository (your 'play' repo)
+      # Step 3: Checkout the Playwright test repository (your 'play' repo)
       - name: Checkout the Playwright test repository
         uses: actions/checkout@v4
         with:
-          repository: Inna-test/play  # This is the repository with the 'tests' directory
+          repository: Inna-test/play  # Replace with your 'play' repository name
           token: ${{ secrets.AUTOTEST_REPO_TOKEN }}  # GitHub secret with access to 'play' repo
-          path: play  # You can specify a folder name (e.g., 'play') where the tests will be saved
+          path: play  # This will clone the 'play' repository into a folder named 'play'
 
-      - name: Install dependencies
+      # Step 4: Install dependencies for the Next.js app
+      - name: Install dependencies for Next.js app
         run: |
-          npm install
+          npm install  # or 'yarn install', depending on your setup
 
+      # Step 5: Start the Next.js app in the background
       - name: Start Next.js app in the background
         run: |
-          nohup npm run dev &  # Start Next.js app in the background
+          nohup npm run dev &  # Starts the Next.js app in the background
 
-    # Set up Python environment for Playwright
+      # Step 6: Wait for Next.js app to be ready
+      - name: Wait for Next.js app to be ready
+        run: |
+          while ! curl --silent --fail http://localhost:3000; do
+            echo "Waiting for server to be ready..."
+            sleep 2
+          done
+
+      # Step 7: Set up Python for Playwright tests
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v4
         with:
           python-version: '3.11'  # Use any Python version that supports Playwright
 
-    # Install dependencies for the Playwright tests
-      - name: Install test dependencies
-        run: |
-          cd tests
-          python -m pip install --upgrade pip
-          pip install -r tests/requirements.txt
-          playwright install
-
-    # Step 8: Install Python dependencies for Playwright
-      - name: Install Python dependencies
+      # Step 8: Install Python dependencies for Playwright tests
+      - name: Install Python dependencies for Playwright tests
         run: |
           pip install -r play/tests/requirements.txt  # Install dependencies from the 'play/tests' folder
+          playwright install  # Install Playwright browsers
 
       # Step 9: Run Playwright tests
       - name: Run Playwright tests
         run: |
-          pytest play/tests  # Run Playwright tests located in 'play/tests' folder
+          pytest play/tests  # Run Playwright tests located in the 'play/tests' folder
