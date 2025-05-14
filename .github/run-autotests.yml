@@ -1,0 +1,44 @@
+name: Run Playwright Autotests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Checkout the code of the nextjs-app repository
+    - name: Checkout this (Next.js) repo
+      uses: actions/checkout@v4
+
+    # Checkout the Playwright test repo
+    - name: Checkout the test repo
+      uses: actions/checkout@v4
+      with:
+        repository: Inna-test/testplaywright  # Use your repo name here
+        token: ${{ secrets.AUTOTEST_REPO_TOKEN }}  # GitHub Secret for access to the test repo
+        path: tests  # Clone the tests repo into a 'tests' folder
+
+    # Set up Python environment for Playwright
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'  # Use any Python version that supports Playwright
+
+    # Install dependencies for the Playwright tests
+    - name: Install test dependencies
+      run: |
+        cd tests
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt  # Install from 'requirements.txt' of the Playwright tests repo
+        playwright install  # Install Playwright browser binaries
+
+    # Run Playwright tests using pytest
+    - name: Run Playwright tests
+      run: |
+        cd tests
+        pytest  # Run the tests using pytest
