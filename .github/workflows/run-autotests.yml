@@ -49,9 +49,12 @@ jobs:
           pip install -r tests/requirements.txt
           playwright install
 
-    # Run Playwright tests using pytest
+    # Step 8: Install Python dependencies for Playwright
+      - name: Install Python dependencies
+        run: |
+          pip install -r play/tests/requirements.txt  # Install dependencies from the 'play/tests' folder
+
+      # Step 9: Run Playwright tests
       - name: Run Playwright tests
         run: |
-          cd tests
-          pytest  # Run the tests using pytest
-        ##
+          pytest play/tests  # Run Playwright tests located in 'play/tests' folder
