@@ -19,6 +19,14 @@ jobs:
         with:
           node-version: '18'
 
+         # Step 2: Checkout the Playwright tests repository (your 'play' repo)
+      - name: Checkout the Playwright test repository
+        uses: actions/checkout@v4
+        with:
+          repository: Inna-test/play  # This is the repository with the 'tests' directory
+          token: ${{ secrets.AUTOTEST_REPO_TOKEN }}  # GitHub secret with access to 'play' repo
+          path: play  # You can specify a folder name (e.g., 'play') where the tests will be saved
+
       - name: Install dependencies
         run: |
           npm install
